@@ -1,36 +1,60 @@
-#ifndef BOX_H // директива препроцессора C++, 
+#ifndef BOX_H  // директива препроцессора C++, 
                 // которая используется для защиты от 
                 // повторного включения заголовочного 
                 // файла (robot.h) в программу.
 #define BOX_H
 
 #include <string>
-#include <vector> 
+#include <vector>
 
-class GameBox {
-private:
-    std::string name_; // название игры
-    int width_; // ширина коробки
-    int height_; // высота коробки
-    int depth_; // глубина коробки
+// Базовый класс Box
+class Box {
+protected:
+    int width_;   // ширина
+    int height_;  // высота
+    int depth_;   // глубина
 
 public:
-    // Конструктор по умолчанию
-    GameBox() : name_(""), width_(0), height_(0), depth_(0) {}
+    Box(int width, int height, int depth)
+        : width_(width), height_(height), depth_(depth) {}
 
-    // Конструктор инициализации
-    GameBox(const std::string& name, int width, int height, int depth)
-        : name_(name), width_(width), height_(height), depth_(depth) {}
+    virtual ~Box() {} // Виртуальный деструктор
 
-    // Конструктор копирования
-    GameBox(const GameBox& other)
-        : name_(other.name_), width_(other.width_), height_(other.height_), depth_(other.depth_) {}
+    // Виртуальный метод для получения типа
+    virtual std::string getType() const = 0;
 
     // Методы доступа
-    std::string getName() const { return name_; }
     int getWidth() const { return width_; }
     int getHeight() const { return height_; }
     int getDepth() const { return depth_; }
+};
+
+// Производный класс GameBox
+class GameBox : public Box {
+private:
+    std::string name_; // название игры
+
+public:
+    // Конструктор по умолчанию
+    GameBox() : Box(0, 0, 0), name_("") {}
+
+    // Конструктор инициализации
+    GameBox(const std::string& name, int width, int height, int depth)
+        : Box(width, height, depth), name_(name) {}
+
+    // Метод для получения имени
+    std::string getName() const { return name_; }
+
+    // Метод для получения типа
+    std::string getType() const override {
+        return "GameBox: " + name_;
+    }
+
+    // Метод для проверки пересечения с другой коробкой
+    bool intersects(const GameBox& other) const {
+        return (width_ > other.width_ && height_ > other.height_ && depth_ > other.depth_) ||
+               (width_ < other.width_ && height_ < other.height_ && depth_ < other.depth_);
+    }
 
     // Перегрузка оператора ==
     bool operator==(const GameBox& other) const {
@@ -39,41 +63,43 @@ public:
                height_ == other.height_ &&
                depth_ == other.depth_;
     }
-
-    // Метод для проверки пересечения с другой коробкой
-    bool intersects(const GameBox& other) const {
-        // Реализовать логику проверки пересечения
-        return (width_ > other.width_ && height_ > other.height_ && depth_ > other.depth_) ||
-               (width_ < other.width_ && height_ < other.height_ && depth_ < other.depth_);
-    }
 };
 
-
-class BoxContainer {
+// Производный класс BoxContainer
+class BoxContainer : public Box {
 private:
     std::vector<GameBox> boxes_; 
     int maxItems_; // вместимость контейнера
 
 public:
-    // конструктор по умолчанию
-    BoxContainer() : maxItems_(10) {}
+    // Конструктор по умолчанию
+    BoxContainer() : Box(10, 10, 10), maxItems_(10) {}
 
-    // конструктор инициализации
-    BoxContainer(const std::vector<GameBox>& boxes) : boxes_(boxes), maxItems_(10) {}
+    // Конструктор инициализации
+    BoxContainer(int width, int height, int depth, int maxItems)
+        : Box(width, height, depth), maxItems_(maxItems) {}
 
-    // конструктор копирования
-    BoxContainer(const BoxContainer& other) : boxes_(other.boxes_), maxItems_(other.maxItems_) {}
+    // Метод для получения типа
+    std::string getType() const override {
+        return "BoxContainer";
+    }
 
-    // методы доступа
+    // Методы доступа
     int getMaxItems() const { return maxItems_; }
     void setMaxItems(int maxItems) { maxItems_ = maxItems; }
     std::vector<GameBox> getBoxes() const { return boxes_; }
-    void addBox(const GameBox& box) { boxes_.push_back(box); }
+    
+    // Метод добавления коробки
+    bool addBox(const GameBox& box) {
+        if (boxes_.size() < maxItems_) {
+            boxes_.push_back(box);
+            return true; // добавление успешное
+        }
+        return false; // контейнер полон
+    }
 
-    // проверка пересечений
+    // Проверка на валидность
     bool isValid() const { return boxes_.size() <= maxItems_; }
 };
 
-#endif 
-
-
+#endif // BOX_H
