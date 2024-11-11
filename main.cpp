@@ -1,4 +1,5 @@
 #include "box.h"
+#include "game_tower.h"
 #include <iostream>
 #include <cassert>
 #include <vector>
@@ -77,6 +78,30 @@ int main() {
     assert(container.isValid()); // контейнер должен быть валидным
 
     std::cout << "Тесты пройдены успешно." << std::endl;
+
+
+    // тестирование нового класса GameTower
+
+    // Создание контейнеров
+    BoxContainer container1(20, 10, 20, 5);
+    BoxContainer container2(15, 10, 15, 5);
+    BoxContainer container3(10, 10, 10, 5);
+
+    // Добавление коробок в контейнеры
+    GameBox box9("Game A", 10, 5, 10);
+    GameBox box10("Game B", 5, 5, 5);
+    container1.addBox(box9);
+    container2.addBox(box10);
+
+    // Создание башни и добавление контейнеров
+    GameTower tower;
+    tower.addContainer(container1);
+    tower.addContainer(container2);
+    tower.addContainer(container3);
+
+    // Проверка устойчивости башни
+    assert(tower.isStable()); //  должна быть устойчивой
+    std::cout << "Башня устойчива." << std::endl;
 
     return 0;
 }
