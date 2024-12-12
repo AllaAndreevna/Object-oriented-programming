@@ -48,6 +48,10 @@ public:
     void loadFromFile(const std::string& filename);
 
     T operator[](const std::string& colors) const; 
+
+    // тот самый метод автодополнения
+    std::vector<std::pair<std::string, T>> autocomplete(const std::string& prefix) const;
+    void printAutocomplete(const std::string& prefix) const;
 };
 
 #include "ColorTrie.cpp" // подключение реализации

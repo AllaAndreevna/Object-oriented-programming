@@ -237,16 +237,6 @@ ColorTrie<T> ColorTrie<T>::operator&&(const ColorTrie& other) const {
     return result;
 }
 
-// template <typename T>
-// void ColorTrie<T>::saveToFile(const std::string& filename) const {
-//     std::ofstream file(filename);
-//     if (file.is_open()) {
-//         for (const auto& key : getAllKeys()) {
-//             file << key.first << std::endl;
-//         }
-//         file.close();
-//     }
-// }
 
 // метод, принимающий путь к файлу и загружающий из него содержимое коллекции
 template <typename T>
@@ -261,4 +251,33 @@ void ColorTrie<T>::loadFromFile(const std::string& filename) {
         insert(key, value); // вставляем в коллекцию
     }
     inFile.close();
+}
+
+
+// Метод автодополнения
+template <typename T>
+std::vector<std::pair<std::string, T>> ColorTrie<T>::autocomplete(const std::string& prefix) const {
+    Node* current = root.get();
+    for (char c : prefix) {
+        if (current->children.find(c) == current->children.end()) {
+            return {}; // Пустой вектор, если префикс не найден
+        }
+        current = current->children[c].get();
+    }
+    std::vector<std::pair<std::string, T>> keys;
+    collectKeys(current, prefix, keys); // Собираем все ключи с данным префиксом
+    return keys;
+}
+
+template <typename T>
+void ColorTrie<T>::printAutocomplete(const std::string& prefix) const {
+    std::vector<std::pair<std::string, T>> keys = autocomplete(prefix);
+    if (keys.empty()) {
+        std::cout << "Нет совпадений для префикса '" << prefix << "'" << std::endl;
+    } else {
+        std::cout << "Совпадения для префикса '" << prefix << "':" << std::endl;
+        for (const auto& key : keys) {
+            std::cout << key.first << " (" << key.second << ")" << std::endl;
+        }
+    }
 }

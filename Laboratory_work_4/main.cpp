@@ -1,21 +1,23 @@
+#include "ColorTrie.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include "ColorTrie.h"
+
 
 int main() {
     system ("chcp 65001"); // кодировка UTF-8
 
+  
     //инициализация
     ColorTrie<char> trie;
 
     // тестирование конструктора копирования
     ColorTrie<char> newTrie(trie);
 
-    // Тест 1: проверка размера коллекции
+    // проверка размера коллекции
     assert(trie.getSize() == 0);
 
-    // Тест 2: добавление значений
+    // добавление значений
     trie.insert("red", 'R');
     assert(trie.getSize() == 1);
     trie.insert("green", 'G');
@@ -23,16 +25,17 @@ int main() {
     trie.insert("red", 'R'); // Дубликат
     assert(trie.getSize() == 2); // размер остаётся прежним
 
-    // Тест 3: проверка наличия значений
+    // trie.insert("blue", "B");  
+    // проверка наличия значений
     assert(trie.contains("red") == true);
     assert(trie.contains("blue") == false);
 
-    // Тест 4: удаление значений
+    // удаление значений
     trie.remove("red");
     assert(trie.getSize() == 1);
     assert(trie.contains("red") == false);
 
-    // Тест 5: сохранение и загрузка из файла
+    // сохранение и загрузка из файла
     trie.saveToFile("trie_data.txt");
     ColorTrie<char> loadedTrie;
     loadedTrie.loadFromFile("trie_data.txt");
@@ -40,29 +43,29 @@ int main() {
     assert(loadedTrie.contains("green") == true);
     assert(trie == loadedTrie);
 
-    // Тест 6: оператор сравнения
+    // оператор сравнения
     ColorTrie<char> anotherTrie;
     anotherTrie.insert("green", 'G');
     assert(loadedTrie == anotherTrie);
 
-    // Тест 7: оператор пересечения с пустой коллекцией
+    // оператор пересечения с пустой коллекцией
     ColorTrie<char> AnotherNewTrie;
     ColorTrie<char> intersection = trie && AnotherNewTrie;
     assert(intersection.getSize() == 0);
     assert(intersection.contains("green") == false);
 
-    // Тест 8: оператор пересечения с непустой коллекцией
+    // оператор пересечения с непустой коллекцией
     ColorTrie<char> intersection1 = trie && loadedTrie;
     assert(intersection1.getSize() == 1);
     assert(intersection1.contains("green") == true); // возвращенная коллекция 
                                                      // равна одной из исходных коллекций
 
-    // Тест 9: очистка коллекции
+    // очистка коллекции
     trie.clear();
     ColorTrie<char> OneMoreTrie;
     assert(trie.getSize() == OneMoreTrie.getSize());
 
-    // Тест 10: копирование, сравнение и сравнение коллекции
+    // копирование, сравнение и сравнение коллекции
     ColorTrie<char> originalTrie;
     originalTrie.insert("red", 'R');
     originalTrie.insert("green", 'G');
@@ -76,6 +79,15 @@ int main() {
 
     assert(!(originalTrie == copiedTrie));
 
+    // Тестирование функции автодополнения
+    ColorTrie<char> trie_auto;
+    trie_auto.insert("red", 'R');
+    trie_auto.insert("red-blue", 'R');
+    trie_auto.printAutocomplete("re");
+
+
     std::cout << "Все тесты пройдены успешно!" << std::endl;
     return 0;
 }
+
+// структура класса
